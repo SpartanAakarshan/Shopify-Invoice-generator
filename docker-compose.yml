@@ -9,14 +9,32 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/shopify_invoice_app
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
       - SHOPIFY_APP_URL=${SHOPIFY_APP_URL}
+    depends_on:
+      - db
     restart: unless-stopped
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=shopify_invoice_app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
 networks:
   app-network:
-    driver: bridge 
+    driver: bridge
+
+volumes:
+  postgres_data: 
