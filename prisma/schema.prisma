@@ -1,0 +1,50 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Shop {
+  id            String         @id @default(cuid())
+  name          String
+  domain        String         @unique
+  accessToken   String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  invoices      Invoice[]
+  businessCards BusinessCard[]
+}
+
+model Invoice {
+  id         String   @id @default(cuid())
+  shopId     String
+  customerId String
+  items      String   // JSON string of items
+  total      Float
+  tax        Float
+  discount   Float?
+  notes      String?
+  status     String   // DRAFT, SENT, PAID, CANCELLED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  shop       Shop     @relation(fields: [shopId], references: [id])
+}
+
+model BusinessCard {
+  id           String   @id @default(cuid())
+  shopId       String
+  businessName String
+  logo         String   // URL to logo image
+  contactInfo  String   // JSON string of contact information
+  socialLinks  String   // JSON string of social media links
+  offerCode    String?
+  offerExpiry  DateTime?
+  offerDetails String?
+  status       String   // ACTIVE, EXPIRED, DISABLED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  shop         Shop     @relation(fields: [shopId], references: [id])
+} 
